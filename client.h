@@ -21,8 +21,21 @@ public:
         in.setDevice(tcp_socket);
         in.setVersion(QDataStream::Qt_1_0);
         udp_skt=new QUdpSocket(this);
-        udp_skt->bind(45454,QUdpSocket::ShareAddress);
+        udp_skt->bind(12347,QUdpSocket::ShareAddress);
+        write_client_msg();
+        search();
     }
+    void write_client_msg()
+    {
+
+        QByteArray b;
+        b.append("1234");
+        udp_skt->writeDatagram(b.data(), b.size(),
+                               QHostAddress::Broadcast, 12346);
+        qDebug()<<QString(b)<<"send";
+
+    }
+
     void read_msg()
     {
         //        in.setDevice(tcp_socket);
@@ -46,7 +59,10 @@ public:
 
     void search()
     {
-        while(udp_skt->hasPendingDatagrams()){
+      //  while(udp_skt->hasPendingDatagrams())
+            if(udp_skt->hasPendingDatagrams())
+
+        {
 
             datagram.resize((udp_skt->pendingDatagramSize()));
             udp_skt->readDatagram(datagram.data(),datagram.size());
