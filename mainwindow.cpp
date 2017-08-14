@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "client.h"
+#include "camera.h"
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -12,6 +13,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->widget->setLayout(ui->gridLayout_2);
 
     c=new client();
+  //  CameraManager *cam=new CameraManager();
+        render=new YuvRender();
+
+     //   connect(&cam->cams[0]->handler,SIGNAL(pic_ok(Mat)),render,SLOT(set_mat(Mat)));
+
+        ui->gridLayout_2->addWidget(render);
+      //  ui->gridLayout_2->addWidget(render,1,1);
 }
 
 MainWindow::~MainWindow()
@@ -21,5 +29,17 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    c->write_client_msg();
+   c->broadcast_to_client();
+   //  c->connect_to_server();
+//    render->show();
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    c->get_client_setting();
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+        c->connect_to_server();
 }

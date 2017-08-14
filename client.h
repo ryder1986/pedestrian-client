@@ -22,10 +22,10 @@ public:
         in.setVersion(QDataStream::Qt_1_0);
         udp_skt=new QUdpSocket(this);
         udp_skt->bind(12347,QUdpSocket::ShareAddress);
-        write_client_msg();
+        broadcast_to_client();
         search();
     }
-    void write_client_msg()
+    void broadcast_to_client()
     {
 
         QByteArray b;
@@ -34,6 +34,25 @@ public:
                                QHostAddress::Broadcast, 12346);
         qDebug()<<QString(b)<<"send";
 
+    }
+
+    void pack_tcp_data(char *c,int length){
+
+            quint16  *pos_version=( quint16  *)c+2;
+            quint16 *pos_length=( quint16  *)c;
+            *pos_version=1;
+            *pos_length=length;
+    }
+    char buf[10000];
+    void get_client_setting(){
+        qDebug()<<"try to get server setting";
+        char *data=buf;
+        quint16 *pos_op=(quint16 *)(data+4);
+        *pos_op=0;
+
+        pack_tcp_data(buf,0);
+        int ret=tcp_socket->write(buf,6);
+        qDebug()<<"ret "<<ret;
     }
 
     void read_msg()
@@ -72,7 +91,7 @@ public:
 signals:
 
 public slots:
-    void request_msg()
+    void connect_to_server()
     {
         tcp_socket->connectToHost("192.168.1.216",12345);
     }
