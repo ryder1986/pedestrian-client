@@ -13,13 +13,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->widget->setLayout(ui->gridLayout_2);
 
     c=new client();
-  //  CameraManager *cam=new CameraManager();
-        render=new YuvRender();
-
-     //   connect(&cam->cams[0]->handler,SIGNAL(pic_ok(Mat)),render,SLOT(set_mat(Mat)));
-
-        ui->gridLayout_2->addWidget(render);
-      //  ui->gridLayout_2->addWidget(render,1,1);
+    //CameraManager *cam=new CameraManager();
+    render=new YuvRender();
+    Config *cfg=new Config;
+    Camera *cam=new Camera(cfg->data.camera[0]);
+   // connect(&cam->cams[0]->handler,SIGNAL(pic_ok(Mat)),render,SLOT(set_mat(Mat)));
+  //  connect(&cam->cams[0]->src,SIGNAL(frame_update(Mat)),render,SLOT(set_mat(Mat)));
+    connect(&cam->src,SIGNAL(frame_update(Mat)),render,SLOT(set_mat(Mat) ));
+    ui->gridLayout_2->addWidget(render);
+    //  ui->gridLayout_2->addWidget(render,1,1);
 }
 
 MainWindow::~MainWindow()
@@ -29,9 +31,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-   c->broadcast_to_client();
-   //  c->connect_to_server();
-//    render->show();
+    c->broadcast_to_client();
+    //  c->connect_to_server();
+    //    render->show();
 }
 
 void MainWindow::on_pushButton_4_clicked()
@@ -41,5 +43,5 @@ void MainWindow::on_pushButton_4_clicked()
 
 void MainWindow::on_pushButton_clicked()
 {
-        c->connect_to_server();
+    c->connect_to_server();
 }

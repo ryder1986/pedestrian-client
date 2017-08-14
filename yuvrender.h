@@ -19,21 +19,39 @@ class YuvRender : public QGLWidget
     Q_OBJECT
 public:
 
-    explicit YuvRender(QWidget *parent = 0);
-    void set_buf(char *);
+    // explicit YuvRender(QWidget *parent = 0);
+    YuvRender(QWidget *parent=0) :
+        QGLWidget(parent),video_width(VIDEO_WIDTH),video_height(VIDEO_HEIGHT),pressed_x(0),pressed_y(0)
+    {
+        tick=0;
+    }
+
+
+    void  set_buf(char *buffer)
+    {
+        memcpy(yuv_buf,buffer,VIDEO_WIDTH*VIDEO_HEIGHT*3/2);
+    }
+
+    //    void  initializeGL()
+    //    {
+
+    //    }
+
+    //    void  resizeGL(int w, int h)
+    //    {
+
+    //    }
 
 
 
 
 
-
-
-    unsigned char  CONVERT_ADJUST(double tmp)
+    static unsigned char  CONVERT_ADJUST(double tmp)
     {
         return (unsigned char)((tmp >= 0 && tmp <= 255)?tmp:(tmp < 0 ? 0 : 255));
     }
     //YUV420P to RGB24
-     void   CONVERT_YUV420PtoRGB24(unsigned char* yuv_src,unsigned char* rgb_dst,int nWidth,int nHeight)
+    static  void   CONVERT_YUV420PtoRGB24(unsigned char* yuv_src,unsigned char* rgb_dst,int nWidth,int nHeight)
     {
         unsigned char *tmpbuf=(unsigned char *)malloc(nWidth*nHeight*3);
         unsigned char Y,U,V,R,G,B;
@@ -90,14 +108,144 @@ public:
         free(tmpbuf);
     }
 
+
+
+    void paint_layout1(QPainter &painter){
+#if 0
+        painter.beginNativePainting();
+        makeCurrent();
+        CONVERT_YUV420PtoRGB24((unsigned char *)yuv_buf,(unsigned char *)rgb_buf,video_width,video_height);
+        glPixelZoom(1.0f*this->width()/video_width, 1.0f*this->height()/video_height);
+#if 0
+        glDrawPixels(video_width, video_height,GL_RGB, GL_UNSIGNED_BYTE, rgb_buf);
+#else
+        QImage img((uchar *)rgb_buf,video_width,video_height,QImage::Format_RGB888);
+        //  QImage img((uchar *)rgb_buf,video_width,video_height,QImage::Format_RGB888);
+        //QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_Indexed8);
+        //   QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_Grayscale8);
+
+        painter.drawImage(QRect(0,0,this->width(),this->height()),img);
+#endif
+        painter.endNativePainting();
+#else
+        painter.beginNativePainting();
+        makeCurrent();
+     //   QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_Indexed8);
+     //   QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_RGB888);
+
+        Mat rgb_frame;
+        cvtColor(frame,rgb_frame,CV_YUV2RGB);
+        QImage  img = QImage((const uchar*)(rgb_frame.data),rgb_frame.cols,rgb_frame.rows,rgb_frame.cols*rgb_frame.channels(),QImage::Format_RGB888);
+        painter.drawImage(QRect(0,0,this->width(),this->height()),img);
+        painter.endNativePainting();
+#endif
+    }
+    void paint_layout2(QPainter &painter){
+#if 0
+        QBrush red_brush_trans(QColor(0,0,200,100));
+        painter.setBrush(red_brush_trans);
+        // pressed_x=0;
+        // pressed_y=0;
+        //  if(flg++>10)
+
+
+        painter.drawEllipse(pressed_x+tick%300,pressed_y,100,100);
+        QPen testpen(red_brush_trans,10);
+        painter.setPen(testpen);
+
+        for(int i=0;i<8;i++){
+            painter.drawLine(pt[i*2],pt[i*2+1]);
+        }
+
+
+        for(int i=0;i<8;i++){
+            painter.drawLine(pt[i*2],pt[i*2+1]);
+        }
+
+        for(int i=0;i<8;i++){
+            painter.drawLine(pt_rear[i*2],pt_rear[i*2+1]);
+        }
+        painter.drawEllipse(p1,10,10);
+        painter.drawEllipse(p2,10,10);
+        painter.drawEllipse(p3,10,10);
+#endif
+    }
+
+    void paintEvent(QPaintEvent *)
+    {
+        qDebug()<<"paint "<<tick++;
+        tick+=10;
+        QPainter painter(this);
+        paint_layout1(painter);
+        //  paint_layout2(painter);
+    }
+    //protected:
+    //    void paintEvent(QPaintEvent *)
+    //    {
+    //        qDebug()<<"paint "<<tick++;
+    //        tick+=10;
+    //        QPainter painter(this);
+
+
+
+    //        painter.beginNativePainting();
+    //        makeCurrent();
+    //        CONVERT_YUV420PtoRGB24((unsigned char *)yuv_buf,(unsigned char *)rgb_buf,video_width,video_height);
+    //        glPixelZoom(1.0f*this->width()/video_width, 1.0f*this->height()/video_height);
+    //#if 0
+    //        glDrawPixels(video_width, video_height,GL_RGB, GL_UNSIGNED_BYTE, rgb_buf);
+    //#else
+    //        QImage img((uchar *)rgb_buf,video_width,video_height,QImage::Format_RGB888);
+    //        //  QImage img((uchar *)rgb_buf,video_width,video_height,QImage::Format_RGB888);
+    //        //QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_Indexed8);
+    //        //   QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_Grayscale8);
+
+    //        painter.drawImage(QRect(0,0,this->width(),this->height()),img);
+    //#endif
+    //        painter.endNativePainting();
+
+
+
+    //        QBrush red_brush_trans(QColor(0,0,200,100));
+    //        painter.setBrush(red_brush_trans);
+    //        // pressed_x=0;
+    //        // pressed_y=0;
+    //        //  if(flg++>10)
+
+
+    //        painter.drawEllipse(pressed_x+tick%300,pressed_y,100,100);
+    //        QPen testpen(red_brush_trans,10);
+    //        painter.setPen(testpen);
+
+    //        for(int i=0;i<8;i++){
+    //            painter.drawLine(pt[i*2],pt[i*2+1]);
+    //        }
+
+
+    //        for(int i=0;i<8;i++){
+    //            painter.drawLine(pt[i*2],pt[i*2+1]);
+    //        }
+
+    //        for(int i=0;i<8;i++){
+    //            painter.drawLine(pt_rear[i*2],pt_rear[i*2+1]);
+    //        }
+    //        painter.drawEllipse(p1,10,10);
+    //        painter.drawEllipse(p2,10,10);
+    //        painter.drawEllipse(p3,10,10);
+    //    }
+    void  initializeGL()
+    {
+
+    }
+
 signals:
 
 public slots:
-     void set_mat(Mat f)
-     {
-         frame=f;
-         this->update();
-     }
+    void set_mat(Mat f)
+    {
+        frame=f;
+        this->update();
+    }
 
 private:
     char yuv_buf[640*480*3/2];
@@ -107,10 +255,19 @@ private:
     int pressed_x,pressed_y,pressed;
     int tick;
     Mat frame;
+
+
+    QPoint pt[16];
+    QPoint pt_rear[16];
+    QPoint p1;
+    QPoint p2;
+    QPoint p3;
 protected:
-    void  initializeGL();
-    void  resizeGL(int w, int h);
-    void  paintEvent(QPaintEvent *);
- };
+    //  void  initializeGL();
+    //  void  resizeGL(int w, int h);
+    //  void  paintEvent(QPaintEvent *);
+
+
+};
 
 #endif // YUVRENDER_H

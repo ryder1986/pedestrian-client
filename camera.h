@@ -137,7 +137,8 @@ private:
     int frame_num = 0;
 
 };
-class VideoSrc{
+class VideoSrc: public QObject{
+    Q_OBJECT
 public:
 
     VideoSrc()
@@ -152,7 +153,10 @@ public:
     void set(VideoHandler &handler)
     {
         handler.frame_ori= cvQueryFrame(p_cap);
+        emit(frame_update(handler.frame_ori));
     }
+signals:
+    void frame_update(Mat frame);
 private:
     CvCapture *p_cap;
 
@@ -161,7 +165,8 @@ class Camera : public QObject
 {
     Q_OBJECT
 public:
-      VideoHandler handler;
+    VideoHandler handler;
+    VideoSrc src;
     explicit Camera(camera_data_t dat,QObject *parent=0) : data(dat),QObject(parent)
     {
 
@@ -186,7 +191,7 @@ public slots:
 private:
     camera_data_t data;
     QTimer *timer;
-    VideoSrc src;
+
 
 };
 
