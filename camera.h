@@ -13,6 +13,7 @@
 #include <opencv2/ml/ml.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 #include <QImage>
+#include "client.h"
 #include "config.h"
 using namespace cv;
 using namespace std;
@@ -200,19 +201,20 @@ class CameraManager:public QObject{
     Q_OBJECT
 public:
     CameraManager(){
+        cfg=new Config("/root/repo-github/pedestrian/config.json");
 
-        for(int i=0;i<cfg.data.camera_amount;i++){
-            Camera *c=new Camera(cfg.data.camera[i]);
-            //   Camera c(cfg.data.camera[i]);
-            cams.append(c);
-        }
+//        for(int i=0;i<cfg.data.camera_amount;i++){
+//            Camera *c=new Camera(cfg.data.camera[i]);
+//            //   Camera c(cfg.data.camera[i]);
+//            cams.append(c);
+//        }
     }
     ~CameraManager(){
-        for(int i=0;i<cfg.data.camera_amount;i++){
+//        for(int i=0;i<cfg.data.camera_amount;i++){
 
 
-            delete cams[i];
-        }
+//            delete cams[i];
+//        }
     }
 
     void add_camera()
@@ -228,10 +230,11 @@ public:
 
     }
 
-  QList <Camera *> cams;
+    QList <Camera *> cams;
 private:
 
-    Config cfg;
+    Config *cfg;
+  //  Client *client;
 };
 
 

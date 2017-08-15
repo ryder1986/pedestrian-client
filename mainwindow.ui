@@ -40,7 +40,7 @@
         </property>
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="0">
-          <widget class="QPushButton" name="pushButton_2">
+          <widget class="QPushButton" name="pushButton_search_device">
            <property name="text">
             <string>search device</string>
            </property>
@@ -49,12 +49,12 @@
          <item row="3" column="0">
           <widget class="QPushButton" name="pushButton_3">
            <property name="text">
-            <string>PushButton</string>
+            <string>use config</string>
            </property>
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QPushButton" name="pushButton">
+          <widget class="QPushButton" name="pushButton_connect_server">
            <property name="text">
             <string>connect server</string>
            </property>
@@ -74,7 +74,7 @@
           </spacer>
          </item>
          <item row="1" column="0">
-          <widget class="QPushButton" name="pushButton_4">
+          <widget class="QPushButton" name="pushButton_get_config">
            <property name="text">
             <string>get config</string>
            </property>

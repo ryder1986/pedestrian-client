@@ -22,7 +22,8 @@ HEADERS  += mainwindow.h \
     camera.h \
     config.h \
     common.h \
-    yuvrender.h
+    yuvrender.h \
+    protocol.h
 
 FORMS    += mainwindow.ui
 INCLUDEPATH +=/usr/include

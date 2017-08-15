@@ -8,14 +8,14 @@
 #include <QTcpSocket>
 #include <QDataStream>
 #include <QFile>
-class client : public QObject
+class Client : public QObject
 {
     Q_OBJECT
 public:
-    client(){
+    Client(){
         tcp_socket=new QTcpSocket();
 
-        connect(tcp_socket, &QIODevice::readyRead, this, &client::read_msg);
+        connect(tcp_socket, &QIODevice::readyRead, this, &Client::read_msg);
         //  f->open(tcp_socket,QFile::ReadOnly);
 
         in.setDevice(tcp_socket);
@@ -38,10 +38,10 @@ public:
 
     void pack_tcp_data(char *c,int length){
 
-            quint16  *pos_version=( quint16  *)c+2;
-            quint16 *pos_length=( quint16  *)c;
-            *pos_version=1;
-            *pos_length=length;
+        quint16  *pos_version=( quint16  *)c+2;
+        quint16 *pos_length=( quint16  *)c;
+        *pos_version=1;
+        *pos_length=length;
     }
     char buf[10000];
     void get_client_setting(){
@@ -78,8 +78,8 @@ public:
 
     void search()
     {
-      //  while(udp_skt->hasPendingDatagrams())
-            if(udp_skt->hasPendingDatagrams())
+        //  while(udp_skt->hasPendingDatagrams())
+        if(udp_skt->hasPendingDatagrams())
 
         {
 
@@ -88,6 +88,23 @@ public:
             qDebug()<<"get"<<datagram.data();
         }
     }
+    void search_device()
+    {
+
+    }
+
+    QByteArray  call_server(QByteArray msg)
+    {
+        QByteArray ret;
+        ret.resize(0);
+        tcp_socket->write(msg);
+        if(tcp_socket->waitForReadyRead())
+
+            ret=tcp_socket->readAll();
+        return ret;
+    }
+
+
 signals:
 
 public slots:
@@ -95,7 +112,6 @@ public slots:
     {
         tcp_socket->connectToHost("192.168.1.216",12345);
     }
-
 
 
     void  displayError(QAbstractSocket::SocketError socketError)
