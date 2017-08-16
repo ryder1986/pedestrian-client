@@ -22,8 +22,8 @@ public:
         in.setVersion(QDataStream::Qt_1_0);
         udp_skt=new QUdpSocket(this);
         udp_skt->bind(12347,QUdpSocket::ShareAddress);
-        broadcast_to_client();
-        search();
+      //  broadcast_to_client();
+      //  search();
     }
     void broadcast_to_client()
     {
@@ -32,8 +32,8 @@ public:
         b.append("1234");
         udp_skt->writeDatagram(b.data(), b.size(),
                                QHostAddress::Broadcast, 12346);
+     //   prt(info,"printing..");
         qDebug()<<QString(b)<<"send";
-
     }
 
     void pack_tcp_data(char *c,int length){
@@ -93,13 +93,12 @@ public:
 
     }
 
-    QByteArray  call_server(QByteArray msg)
+    QByteArray  call_server(char *buf,int len)
     {
         QByteArray ret;
         ret.resize(0);
-        tcp_socket->write(msg);
+        tcp_socket->write(buf,len);
         if(tcp_socket->waitForReadyRead())
-
             ret=tcp_socket->readAll();
         return ret;
     }

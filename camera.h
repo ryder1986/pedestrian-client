@@ -200,6 +200,7 @@ private:
 class CameraManager:public QObject{
     Q_OBJECT
 public:
+    Config *cfg;
     CameraManager(){
         cfg=new Config("/root/repo-github/pedestrian/config.json");
 
@@ -233,7 +234,7 @@ public:
     QList <Camera *> cams;
 private:
 
-    Config *cfg;
+
   //  Client *client;
 };
 

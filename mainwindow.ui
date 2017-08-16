@@ -49,7 +49,7 @@
          <item row="3" column="0">
           <widget class="QPushButton" name="pushButton_3">
            <property name="text">
-            <string>use config</string>
+            <string>add camera</string>
            </property>
           </widget>
          </item>

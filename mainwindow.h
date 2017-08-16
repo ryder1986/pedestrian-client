@@ -8,6 +8,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "client.h"
+#include "protocol.h"
 #include "camera.h"
 namespace Ui {
 class MainWindow;
@@ -82,16 +83,18 @@ void on_pushButton_connect_server_clicked();
 
 void on_pushButton_get_config_clicked();
 
+void on_pushButton_3_clicked();
+
 private:
 //    client *  clt;
     Ui::MainWindow *ui;
     CameraManager *cam_manager;
     Client *client;
+    char buf[BUF_MAX_LEN];
  //   YuvRender *render;
 };
 
 #endif // MAINWINDOW_H
-
 
 
 
