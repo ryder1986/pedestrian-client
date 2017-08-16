@@ -51,7 +51,8 @@ void MainWindow::on_pushButton_connect_server_clicked()
 void MainWindow::on_pushButton_get_config_clicked()
 {
     int len=Protocol::encode_configuration_request(buf);
-    QByteArray rst=client->call_server(buf,8);
+    QByteArray rst=client->call_server(buf,HEAD_LENGTH);
+
     cam_manager->cfg->set_ba(rst);
 }
 
@@ -59,6 +60,6 @@ void MainWindow::on_pushButton_get_config_clicked()
 void MainWindow::on_pushButton_3_clicked()
 {
     int len=Protocol::encode_addcam_request(buf);
-    QByteArray rst=client->call_server(buf,8);
+    QByteArray rst=client->call_server(buf,HEAD_LENGTH);
     cam_manager->cfg->set_ba(rst);
 }

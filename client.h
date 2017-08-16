@@ -8,6 +8,7 @@
 #include <QTcpSocket>
 #include <QDataStream>
 #include <QFile>
+#include <QThread>
 class Client : public QObject
 {
     Q_OBJECT
@@ -97,9 +98,12 @@ public:
     {
         QByteArray ret;
         ret.resize(0);
+        char  bf[1000];
         tcp_socket->write(buf,len);
-        if(tcp_socket->waitForReadyRead())
-            ret=tcp_socket->readAll();
+     //   QThread::msleep(3000);
+      if(tcp_socket->waitForReadyRead())
+          //      tcp_socket->read(bf,300);
+       ret=tcp_socket->readAll();
         return ret;
     }
 
