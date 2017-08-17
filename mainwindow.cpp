@@ -50,9 +50,15 @@ void MainWindow::on_pushButton_connect_server_clicked()
 
 void MainWindow::on_pushButton_get_config_clicked()
 {
+
+  //  QByteArray cc("12345");
+//    cc=cc.remove(2,2);
+
+
+
     int len=Protocol::encode_configuration_request(buf);
     QByteArray rst=client->call_server(buf,HEAD_LENGTH);
-
+    rst=rst.remove(0,HEAD_LENGTH);
     cam_manager->cfg->set_ba(rst);
 }
 

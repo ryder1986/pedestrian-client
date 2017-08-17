@@ -16,7 +16,7 @@ public:
     Client(){
         tcp_socket=new QTcpSocket();
 
-        connect(tcp_socket, &QIODevice::readyRead, this, &Client::read_msg);
+  //      connect(tcp_socket, &QIODevice::readyRead, this, &Client::read_msg);
         //  f->open(tcp_socket,QFile::ReadOnly);
 
         in.setDevice(tcp_socket);
@@ -97,13 +97,16 @@ public:
     QByteArray  call_server(char *buf,int len)
     {
         QByteArray ret;
-        ret.resize(0);
-        char  bf[1000];
-        tcp_socket->write(buf,len);
+       // int read_bytes;
+        int write_bytes;
+           ret.resize(0);
+     //   char  bf[1000];
+        write_bytes=tcp_socket->write(buf,len);
      //   QThread::msleep(3000);
       if(tcp_socket->waitForReadyRead())
           //      tcp_socket->read(bf,300);
-       ret=tcp_socket->readAll();
+      ret=tcp_socket->readAll();
+     //   read_bytes=tcp_socket->read(bf,300);
         return ret;
     }
 
