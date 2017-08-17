@@ -133,9 +133,10 @@ public:
      //   QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_Indexed8);
      //   QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_RGB888);
 
-        Mat rgb_frame;
-        cvtColor(frame,rgb_frame,CV_YUV2RGB);
-        QImage  img = QImage((const uchar*)(rgb_frame.data),rgb_frame.cols,rgb_frame.rows,rgb_frame.cols*rgb_frame.channels(),QImage::Format_RGB888);
+        Mat rgb_frame=frame;
+       // cvtColor(frame,rgb_frame,CV_YUV2BGR);
+        QImage  img = QImage((const uchar*)(rgb_frame.data),rgb_frame.cols,rgb_frame.rows,
+                             rgb_frame.cols*rgb_frame.channels(),QImage::Format_RGB888);
         painter.drawImage(QRect(0,0,this->width(),this->height()),img);
         painter.endNativePainting();
 #endif

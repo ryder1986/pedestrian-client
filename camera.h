@@ -54,7 +54,8 @@ public:
             //   frame.create(frame_ori->height,frame_ori->width,CV_8U);
             //   memcpy(frame.data,frame_ori->imageData,frame_ori->imageSize);
             Mat frame(frame_ori);
-   emit(pic_ok(frame));
+         //   imshow("result", frame);
+         //   emit(pic_ok(frame));
             //   imshow("fdsf",frame);
 
 
@@ -104,14 +105,14 @@ public:
                             //rct.x += rect.x;
                             //rct.y += rect.y;
 
-                            rectangle(frame, rct, Scalar(0, 255, 0), 2);
+                      //    rectangle(frame, rct, Scalar(0, 255, 0), 2);
                         }
 
                         it++;
                     }
 
                     //rectangle(frame,rect,Scalar(0,255,0),2);
-                     //   imshow("result", frame);
+                    // imshow("result", frame);
 
                      //   QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_Indexed8);
                     //outputVideo << frame;
@@ -155,7 +156,9 @@ public:
     void set(VideoHandler &handler)
     {
         handler.frame_ori= cvQueryFrame(p_cap);
-        emit(frame_update(handler.frame_ori));
+      //  Mat frm=Mat( handler.frame_ori).clone();
+        Mat frm=Mat( handler.frame_ori);
+        emit(frame_update(frm));
     }
 signals:
     void frame_update(Mat frame);
@@ -188,7 +191,7 @@ public slots:
     {
         //    prt(info,"working");
         src.set(handler);
-        handler.work();
+    //    handler.work();
     }
 
 private:

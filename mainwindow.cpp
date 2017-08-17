@@ -57,8 +57,8 @@ void MainWindow::on_pushButton_get_config_clicked()
 
 
     int len=Protocol::encode_configuration_request(buf);
-    QByteArray rst=client->call_server(buf,HEAD_LENGTH);
-    rst=rst.remove(0,HEAD_LENGTH);
+    QByteArray rst=client->call_server(buf,Protocol::HEAD_LENGTH);
+    rst=rst.remove(0,Protocol::HEAD_LENGTH);
     cam_manager->cfg->set_ba(rst);
     cam_manager->reconfig_camera(ui->gridLayout_2);
    // YuvRender *r=new YuvRender();
@@ -71,6 +71,6 @@ void MainWindow::on_pushButton_get_config_clicked()
 void MainWindow::on_pushButton_3_clicked()
 {
     int len=Protocol::encode_addcam_request(buf);
-    QByteArray rst=client->call_server(buf,HEAD_LENGTH);
+    QByteArray rst=client->call_server(buf,Protocol::HEAD_LENGTH);
     cam_manager->cfg->set_ba(rst);
 }
