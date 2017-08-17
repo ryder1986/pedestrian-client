@@ -92,6 +92,7 @@ private:
     Client *client;
     char buf[BUF_MAX_LEN];
  //   YuvRender *render;
+    QList <YuvRender *> renders;
 };
 
 #endif // MAINWINDOW_H

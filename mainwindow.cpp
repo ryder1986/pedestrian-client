@@ -60,6 +60,11 @@ void MainWindow::on_pushButton_get_config_clicked()
     QByteArray rst=client->call_server(buf,HEAD_LENGTH);
     rst=rst.remove(0,HEAD_LENGTH);
     cam_manager->cfg->set_ba(rst);
+    cam_manager->reconfig_camera(ui->gridLayout_2);
+   // YuvRender *r=new YuvRender();
+  //  connect(cam_manager->cams,SIGNAL())
+
+
 }
 
 

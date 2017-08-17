@@ -15,6 +15,7 @@
 #include <QImage>
 #include "client.h"
 #include "config.h"
+#include "yuvrender.h"
 using namespace cv;
 using namespace std;
 class VideoHandler:public QObject{
@@ -168,6 +169,7 @@ class Camera : public QObject
 public:
     VideoHandler handler;
     VideoSrc src;
+    YuvRender render;
     explicit Camera(camera_data_t dat,QObject *parent=0) : data(dat),QObject(parent)
     {
 
@@ -197,6 +199,7 @@ private:
 };
 
 #include"camera.h"
+#include <QGridLayout>
 class CameraManager:public QObject{
     Q_OBJECT
 public:
@@ -230,6 +233,20 @@ public:
     void change_camera()
     {
 
+    }
+    void reconfig_camera(QGridLayout *layout)
+    {
+        foreach (Camera *c, cams) {
+            delete c;
+        }
+        for(int i=0;i<cfg->data.camera_amount;i++){
+             Camera *c=new Camera(cfg->data.camera[i]);
+             cams.append(c);
+            //  if(i==0)
+              connect(&c->src,SIGNAL(frame_update(Mat)),&c->render,SLOT(set_mat(Mat)));
+          //   if(i==0)
+             layout->addWidget(&c->render,i,i);
+        }
     }
 
     QList <Camera *> cams;

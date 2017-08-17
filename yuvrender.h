@@ -173,10 +173,13 @@ public:
 
     void paintEvent(QPaintEvent *)
     {
+        int len=frame.cols;
+        if(frame.cols>0){
         qDebug()<<"paint "<<tick++;
         tick+=10;
         QPainter painter(this);
         paint_layout1(painter);
+        }
         //  paint_layout2(painter);
     }
     //protected:
@@ -243,6 +246,7 @@ signals:
 public slots:
     void set_mat(Mat f)
     {
+        qDebug()<<"set mat";
         frame=f;
         this->update();
     }
