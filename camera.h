@@ -151,7 +151,7 @@ public:
     }
     ~VideoSrc()
     {
-
+        delete p_cap;
     }
     void set(VideoHandler &handler)
     {
@@ -171,14 +171,17 @@ class Camera : public QObject
     Q_OBJECT
 public:
     VideoHandler handler;
-    VideoSrc src;
+    VideoSrc *p_src;
     YuvRender render;
+    int tick;
     explicit Camera(camera_data_t dat,QObject *parent=0) : data(dat),QObject(parent)
     {
-
+        tick=0;
+        p_src=new VideoSrc();
         timer=new QTimer();
         connect(timer,SIGNAL(timeout()),this,SLOT(work()));
         timer->start(10);
+        connect(p_src,SIGNAL(frame_update(Mat)),&render,SLOT(set_mat(Mat)));
     }
     ~Camera(){
         delete timer;
@@ -189,8 +192,15 @@ signals:
 public slots:
     void work()
     {
+        tick++;
         //    prt(info,"working");
-        src.set(handler);
+        p_src->set(handler);
+        if(tick==200){
+            tick=0;
+            delete p_src;
+            p_src=new VideoSrc();
+             connect(p_src,SIGNAL(frame_update(Mat)),&render,SLOT(set_mat(Mat)));
+        }
     //    handler.work();
     }
 
@@ -246,7 +256,7 @@ public:
              Camera *c=new Camera(cfg->data.camera[i]);
              cams.append(c);
             //  if(i==0)
-              connect(&c->src,SIGNAL(frame_update(Mat)),&c->render,SLOT(set_mat(Mat)));
+          //    connect(c->p_src,SIGNAL(frame_update(Mat)),&c->render,SLOT(set_mat(Mat)));
           //   if(i==0)
              layout->addWidget(&c->render,i,i);
         }

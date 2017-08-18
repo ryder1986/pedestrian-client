@@ -9,6 +9,8 @@
 #include <QDataStream>
 #include <QFile>
 #include <QThread>
+#include "protocol.h"
+#include "common.h"
 class Client : public QObject
 {
     Q_OBJECT
@@ -22,7 +24,8 @@ public:
         in.setDevice(tcp_socket);
         in.setVersion(QDataStream::Qt_1_0);
         udp_skt=new QUdpSocket(this);
-        udp_skt->bind(12347,QUdpSocket::ShareAddress);
+        udp_skt->bind(Protocol::CLIENT_REPORTER_PORT,QUdpSocket::ShareAddress);
+        connect(udp_skt,SIGNAL(readyRead()),this,SLOT(get_reply()));
       //  broadcast_to_client();
       //  search();
     }
@@ -30,11 +33,10 @@ public:
     {
 
         QByteArray b;
-        b.append("1234");
+        b.append("pedestrian");
         udp_skt->writeDatagram(b.data(), b.size(),
-                               QHostAddress::Broadcast, 12346);
-     //   prt(info,"printing..");
-        qDebug()<<QString(b)<<"send";
+                               QHostAddress::Broadcast, Protocol::SERVER_REPORTER_PORT);
+        prt(info,"finding server ...");
     }
 
     void pack_tcp_data(char *c,int length){
@@ -77,21 +79,10 @@ public:
 
     }
 
-    void search()
-    {
-        //  while(udp_skt->hasPendingDatagrams())
-        if(udp_skt->hasPendingDatagrams())
-
-        {
-
-            datagram.resize((udp_skt->pendingDatagramSize()));
-            udp_skt->readDatagram(datagram.data(),datagram.size());
-            qDebug()<<"get"<<datagram.data();
-        }
-    }
     void search_device()
     {
-
+               broadcast_to_client();
+          //  search();
     }
 
     QByteArray  call_server(char *buf,int len)
@@ -114,9 +105,23 @@ public:
 signals:
 
 public slots:
+
+    void get_reply()
+    {
+        //  while(udp_skt->hasPendingDatagrams())
+        if(udp_skt->hasPendingDatagrams())
+        {
+            datagram.resize((udp_skt->pendingDatagramSize()));
+            udp_skt->readDatagram(datagram.data(),datagram.size());
+            prt(info,"get server info : %s",datagram.data());
+            server_ip.append(datagram.split(',')[0]);
+        }
+    }
     void connect_to_server()
     {
-        tcp_socket->connectToHost("192.168.1.216",12345);
+        prt(info,"trying to connect %s",server_ip.data());
+        qDebug()<<server_ip;
+        tcp_socket->connectToHost(server_ip,Protocol::SERVER_PORT);
     }
 
 
@@ -144,7 +149,7 @@ private:
     QFile *f;
 
 
-
+    QString server_ip;
     QUdpSocket *udp_skt;
     QByteArray datagram;
 };
