@@ -40,11 +40,13 @@
 void MainWindow::on_pushButton_search_device_clicked()
 {
     client->search_device();
+    ui->lineEdit_search->setText(client->wait_server_info_reply());
 }
 
 void MainWindow::on_pushButton_connect_server_clicked()
 {
     client->connect_to_server();
+    ui->lineEdit_connect->setText(client->server_ip);
 }
 #include "protocol.h"
 
@@ -64,7 +66,7 @@ void MainWindow::on_pushButton_get_config_clicked()
    // YuvRender *r=new YuvRender();
   //  connect(cam_manager->cams,SIGNAL())
 
-
+    ui->lineEdit_get->setText( cam_manager->cfg->get_ba());
 }
 
 

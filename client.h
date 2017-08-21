@@ -15,6 +15,7 @@ class Client : public QObject
 {
     Q_OBJECT
 public:
+     QString server_ip;
     Client(){
         tcp_socket=new QTcpSocket();
 
@@ -117,6 +118,21 @@ public slots:
             server_ip.append(datagram.split(',')[0]);
         }
     }
+    QString wait_server_info_reply()
+    {
+        while(!udp_skt->hasPendingDatagrams())
+        {
+
+        }
+    //    if(udp_skt->hasPendingDatagrams())
+        {
+            datagram.resize((udp_skt->pendingDatagramSize()));
+            udp_skt->readDatagram(datagram.data(),datagram.size());
+            prt(info,"get server info : %s",datagram.data());
+            server_ip.append(datagram.split(',')[0]);
+        }
+        return server_ip;
+    }
     void connect_to_server()
     {
         prt(info,"trying to connect %s",server_ip.data());
@@ -149,7 +165,7 @@ private:
     QFile *f;
 
 
-    QString server_ip;
+
     QUdpSocket *udp_skt;
     QByteArray datagram;
 };

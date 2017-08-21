@@ -24,7 +24,7 @@ public:
         ui(new Ui::MainWindow)
     {
         ui->setupUi(this);
-        ui->groupBox->setFixedWidth(100);
+        ui->groupBox->setFixedWidth(300);
         ui->centralWidget->setLayout(ui->horizontalLayout);
         ui->groupBox->setLayout(ui->gridLayout);
         ui->widget->setLayout(ui->gridLayout_2);
