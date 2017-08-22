@@ -235,9 +235,21 @@ public:
 //        }
     }
 
-    void add_camera()
+    void add_camera(QString ip)
     {
         //         Camera *c=new Camera(cfg.data.camera[i]);
+
+        camera_data_t ca;
+        ca.ip=ip;
+        ca.port=554;
+        cfg->data.camera.append(ca);
+        cfg->data.camera_amount++;
+        Camera *c=new Camera(cfg->data.camera[cfg->data.camera_amount-1]);
+        cams.append(c);
+       //  if(i==0)
+     //    connect(c->p_src,SIGNAL(frame_update(Mat)),&c->render,SLOT(set_mat(Mat)));
+     //   if(i==0)
+    //    layout->addWidget(&c->render,1,cams.length()-1);
     }
     void del_camera()
     {

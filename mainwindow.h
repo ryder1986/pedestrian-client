@@ -83,7 +83,8 @@ void on_pushButton_connect_server_clicked();
 
 void on_pushButton_get_config_clicked();
 
-void on_pushButton_3_clicked();
+
+void on_pushButton_add_clicked();
 
 private:
 //    client *  clt;
