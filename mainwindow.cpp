@@ -76,6 +76,7 @@ void MainWindow::on_pushButton_add_clicked()
 {
 
     QString ip=ui->lineEdit_add->text();
+    cam_manager->add_camera(ip);
     QByteArray setting= cam_manager->cfg->get_ba();
     int len=Protocol::encode_addcam_request(buf,setting.length());
     memcpy(buf+Protocol::HEAD_LENGTH,setting.data(),setting.length());
