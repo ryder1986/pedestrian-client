@@ -1,18 +1,89 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "client.h"
+#include "camera.h"
+//MainWindow::MainWindow(QWidget *parent) :
+//    QMainWindow(parent),
+//    ui(new Ui::MainWindow)
+//{
+//    ui->setupUi(this);
+//    ui->groupBox->setFixedWidth(100);
+//    ui->centralWidget->setLayout(ui->horizontalLayout);
+//    ui->groupBox->setLayout(ui->gridLayout);
+//    ui->widget->setLayout(ui->gridLayout_2);
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+//    cam_manager=new CameraManager();
+
+////    clt=new client();
+////    //CameraManager *cam=new CameraManager();
+////    render=new YuvRender();
+////    clt->get_client_setting();
+////    Config *cfg=new Config;
+////    Camera *cam=new Camera(cfg->data.camera[0]);
+////    connect(&cam->src,SIGNAL(frame_update(Mat)),render,SLOT(set_mat(Mat) ));
+//#if 0
+//    QPushButton *b1=new QPushButton("1");
+//    QPushButton *b2=new QPushButton("2");
+//    QPushButton *b3=new QPushButton("3");
+//    ui->gridLayout_2->addWidget(b1,1,1);
+//    ui->gridLayout_2->addWidget(b2,2,1);
+//    ui->gridLayout_2->addWidget(b3,2,2);
+//#endif
+// }
+
+//MainWindow::~MainWindow()
+//{
+//          delete cam_manager;
+//    delete ui;
+//}
+
+void MainWindow::on_pushButton_search_device_clicked()
 {
-    ui->setupUi(this);
-    ui->groupBox->setFixedWidth(100);
-    ui->centralWidget->setLayout(ui->horizontalLayout);
-    ui->groupBox->setLayout(ui->gridLayout);
-    ui->widget->setLayout(ui->gridLayout_2);
+    client->search_device();
+    ui->lineEdit_search->setText(client->wait_server_info_reply());
 }
 
-MainWindow::~MainWindow()
+void MainWindow::on_pushButton_connect_server_clicked()
 {
-    delete ui;
+    client->connect_to_server();
+    ui->lineEdit_connect->setText(client->server_ip);
+}
+#include "protocol.h"
+
+void MainWindow::on_pushButton_get_config_clicked()
+{
+
+  //  QByteArray cc("12345");
+//    cc=cc.remove(2,2);
+
+
+
+    int len=Protocol::encode_configuration_request(buf);
+    QByteArray rst=client->call_server(buf,Protocol::HEAD_LENGTH);
+    rst=rst.remove(0,Protocol::HEAD_LENGTH);
+    cam_manager->cfg->set_ba(rst);
+    cam_manager->reconfig_camera(ui->gridLayout_2);
+   // YuvRender *r=new YuvRender();
+  //  connect(cam_manager->cams,SIGNAL())
+
+    ui->lineEdit_get->setText( cam_manager->cfg->get_ba());
+}
+
+
+
+
+void MainWindow::on_pushButton_add_clicked()
+{
+
+    QString ip=ui->lineEdit_add->text();
+    QByteArray setting= cam_manager->cfg->get_ba();
+    int len=Protocol::encode_addcam_request(buf,setting.length());
+    memcpy(buf+Protocol::HEAD_LENGTH,setting.data(),setting.length());
+    QByteArray rst=client->call_server(buf,Protocol::HEAD_LENGTH+setting.length());
+//    rst=rst.remove(0,Protocol::HEAD_LENGTH);
+
+   // YuvRender *r=new YuvRender();
+  //  connect(cam_manager->cams,SIGNAL())
+
+    cam_manager->add_camera("/root/repo-github/pedestrian/test.264");
 }
