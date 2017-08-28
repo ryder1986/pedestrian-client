@@ -7,7 +7,7 @@
 QT       += core gui network opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+CONFIG+=c++11
 TARGET = pedestrian-client
 TEMPLATE = app
 

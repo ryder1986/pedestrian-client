@@ -218,8 +218,8 @@ class CameraManager:public QObject{
 public:
     Config *cfg;
     CameraManager(){
-     //   cfg=new Config("/root/repo-github/pedestrian/config.json");
-        cfg=new Config();
+       cfg=new Config("/root/repo-github/pedestrian-client/config.json");
+      //   cfg=new Config();
 
 //        for(int i=0;i<cfg.data.camera_amount;i++){
 //            Camera *c=new Camera(cfg.data.camera[i]);
@@ -246,14 +246,21 @@ public:
         cfg->data.camera_amount++;
         Camera *c=new Camera(cfg->data.camera[cfg->data.camera_amount-1]);
         cams.append(c);
+        cfg->save();
        //  if(i==0)
      //    connect(c->p_src,SIGNAL(frame_update(Mat)),&c->render,SLOT(set_mat(Mat)));
      //   if(i==0)
     //    layout->addWidget(&c->render,1,cams.length()-1);
     }
-    void del_camera()
+    void del_camera(int index)
     {
-
+        int num=cams.size();
+        Camera *c=cams[index-1];
+        delete c;
+        cams.removeAt(index);
+        cfg->data.camera.removeAt(index);
+        cfg->data.camera_amount--;
+        cfg->save();
     }
     void change_camera()
     {
@@ -264,6 +271,7 @@ public:
         foreach (Camera *c, cams) {
             delete c;
         }
+        int num;
         for(int i=0;i<cfg->data.camera_amount;i++){
              Camera *c=new Camera(cfg->data.camera[i]);
              cams.append(c);
@@ -272,8 +280,22 @@ public:
           //   if(i==0)
              layout->addWidget(&c->render,i,i);
         }
+        num=cams.size();
     }
+    void config_camera(QGridLayout *layout)
+    {
 
+        int num;
+        for(int i=0;i<cfg->data.camera_amount;i++){
+             Camera *c=new Camera(cfg->data.camera[i]);
+             cams.append(c);
+            //  if(i==0)
+          //    connect(c->p_src,SIGNAL(frame_update(Mat)),&c->render,SLOT(set_mat(Mat)));
+          //   if(i==0)
+             layout->addWidget(&c->render,i,i);
+        }
+        num=cams.size();
+    }
     QList <Camera *> cams;
 private:
 

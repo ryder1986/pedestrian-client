@@ -86,6 +86,9 @@ void on_pushButton_get_config_clicked();
 
 void on_pushButton_add_clicked();
 
+
+void on_pushButton_del_clicked();
+
 private:
 //    client *  clt;
     Ui::MainWindow *ui;
