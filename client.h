@@ -129,6 +129,7 @@ public slots:
             datagram.resize((udp_skt->pendingDatagramSize()));
             udp_skt->readDatagram(datagram.data(),datagram.size());
             prt(info,"get server info : %s",datagram.data());
+            server_ip.clear();
             server_ip.append(datagram.split(',')[0]);
         }
         return server_ip;

@@ -130,11 +130,11 @@ public:
 #else
         painter.beginNativePainting();
         makeCurrent();
-     //   QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_Indexed8);
-     //   QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_RGB888);
+        //   QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_Indexed8);
+        //   QImage  img = QImage((const uchar*)(frame.data),frame.cols,frame.rows,frame.cols*frame.channels(),QImage::Format_RGB888);
 
         Mat rgb_frame=frame;
-       // cvtColor(frame,rgb_frame,CV_YUV2BGR);
+        // cvtColor(frame,rgb_frame,CV_YUV2BGR);
         QImage  img = QImage((const uchar*)(rgb_frame.data),rgb_frame.cols,rgb_frame.rows,
                              rgb_frame.cols*rgb_frame.channels(),QImage::Format_RGB888);
         painter.drawImage(QRect(0,0,this->width(),this->height()),img);
@@ -176,10 +176,10 @@ public:
     {
         int len=frame.cols;
         if(frame.cols>0){
-        qDebug()<<"paint "<<tick++;
-        tick+=10;
-        QPainter painter(this);
-        paint_layout1(painter);
+            qDebug()<<"paint "<<tick++;
+            tick+=10;
+            QPainter painter(this);
+            paint_layout1(painter);
         }
         //  paint_layout2(painter);
     }
@@ -245,16 +245,30 @@ public:
 signals:
 
 public slots:
-    void set_mat(Mat f)
+    void render_set_mat(Mat f)
     {
-        qDebug()<<"set mat";
-        frame=f;
+        int size=f.rows;
+
+        if(size>0)
+        {
+            prt(info,"render set frame ok");
+            frame=f;
+        }else
+        {
+            prt(info,"render set frame fail");
+            frame.resize(640*480*3);
+            frame=Mat(640,480,CV_8UC3);
+
+            memset(frame.data,tmp_tick++,640*480*3);
+        }
         this->update();
     }
 
 private:
+    int tmp_tick;
     char yuv_buf[640*480*3/2];
     char rgb_buf[640*480*3];
+    char rgb_buf_tmp[640*480*3];
     int video_width;
     int video_height;
     int pressed_x,pressed_y,pressed;

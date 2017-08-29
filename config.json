@@ -1,5 +1,9 @@
 {
     "camera": [
+        {
+            "ip": "/root/repo-github/pedestrian/test.264",
+            "port": 554
+        }
     ],
-    "camera_total_number": 0
+    "camera_total_number": 1
 }

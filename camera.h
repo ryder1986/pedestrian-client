@@ -31,7 +31,7 @@ public:
     {
 
     }
-    void work()
+    void work(char * url)
     {
         int min_win_width = 64;	// 48, 64, 96, 128, 160, 192, 224
         int max_win_width = 256;
@@ -149,67 +149,167 @@ public:
         //     p_cap= cvCreateFileCapture("rtsp://192.168.1.81:554");  //读取视频
         p_cap= cvCreateFileCapture("/root/repo-github/pedestrian/test.mp4");  //读取视频
     }
+    VideoSrc(QString path)
+    {
+        //     p_cap= cvCreateFileCapture("rtsp://192.168.1.81:554");  //读取视频
+
+        strcpy(url,path.toStdString().data());
+        p_cap= cvCreateFileCapture(url);  //读取视频
+
+        //    prt(info,"get %s",url.toStdString().data());
+    }
     ~VideoSrc()
     {
         delete p_cap;
     }
-    void set(VideoHandler &handler)
+    void output_video(VideoHandler &handler)
     {
-        handler.frame_ori= cvQueryFrame(p_cap);
+        //handler.frame_ori= cvQueryFrame(p_cap);
+         handler.frame_ori= cvQueryFrame(p_cap);
+            int err=0;
+         if(handler.frame_ori==NULL){
+             prt(info,"get video source fail, source url:%s",url);
+            err=1;
+             std::this_thread::sleep_for(chrono::milliseconds(100));
+         }else{
+             //    prt(info,"get video source url:%s",url);
+         }
       //  Mat frm=Mat( handler.frame_ori).clone();
-        Mat frm=Mat( handler.frame_ori);
+         Mat frm;
+         frm.resize(0);
+
+         if(!err)
+             frm=Mat( handler.frame_ori);
+
         emit(frame_update(frm));
+    }
+    VideoHandler &operator>>(VideoHandler &handler)
+    {
+
+        int err=0;
+        handler.frame_ori= cvQueryFrame(p_cap);
+        if(handler.frame_ori==NULL){
+            prt(info,"get video source fail, source url:%s",url);
+            err=1;
+            std::this_thread::sleep_for(chrono::milliseconds(1000));
+        }else{
+            //    prt(info,"get video source url:%s",url);
+        }
+         if(!err)
+             std::this_thread::sleep_for(chrono::milliseconds(1000));
+//            handler.work(url);
+
+        return handler;
     }
 signals:
     void frame_update(Mat frame);
 private:
     CvCapture *p_cap;
+     char url[PATH_LEN];
 
 };
+
+
 class Camera : public QObject
 {
     Q_OBJECT
 public:
-    VideoHandler handler;
-    VideoSrc *p_src;
-    YuvRender render;
-    int tick;
+      YuvRender render;
     explicit Camera(camera_data_t dat,QObject *parent=0) : data(dat),QObject(parent)
     {
         tick=0;
-        p_src=new VideoSrc();
+        p_video_src=new VideoSrc(data.ip);
         timer=new QTimer();
         connect(timer,SIGNAL(timeout()),this,SLOT(work()));
-        timer->start(10);
-        connect(p_src,SIGNAL(frame_update(Mat)),&render,SLOT(set_mat(Mat)));
+        timer->start(100);
+        connect(p_video_src,SIGNAL(frame_update(Mat)),&render,SLOT(render_set_mat(Mat)));
     }
     ~Camera(){
         delete timer;
+        delete p_video_src;
     }
+    void restart(camera_data_t dat)
+    {
+        data=dat;
+    }
+
 
 signals:
 
 public slots:
     void work()
     {
-        tick++;
-        //    prt(info,"working");
-        p_src->set(handler);
-        if(tick==200){
-            tick=0;
-            delete p_src;
-            p_src=new VideoSrc();
-             connect(p_src,SIGNAL(frame_update(Mat)),&render,SLOT(set_mat(Mat)));
-        }
-    //    handler.work();
-    }
+        p_video_src->output_video(video_handler);
+       // *p_video_src>>video_handler;
 
+        //        p_src->set(handler);
+        //    handler.work();
+      //  tick++;
+        // char tmp[100];
+        //       QString tmp(p_video_src->get_url());
+        //        if(tick==20){
+        //        //   strcpy(tmp,p_video_src->url);
+        //            prt(info,"restart cam %s, per 20 frame",tmp.toStdString().data());
+        //            delete p_video_src;
+        //            p_video_src=new VideoSrc(tmp);
+        //            tick=0;
+        //        }
+    }
 private:
+
+
     camera_data_t data;
     QTimer *timer;
-
-
+    VideoSrc*p_video_src;
+    VideoHandler video_handler;
+    int tick;
 };
+
+
+//class Camera : public QObject
+//{
+//    Q_OBJECT
+//public:
+//    VideoHandler handler;
+//    VideoSrc *p_src;
+//    YuvRender render;
+//    int tick;
+//    explicit Camera(camera_data_t dat,QObject *parent=0) : data(dat),QObject(parent)
+//    {
+//        tick=0;
+//        p_src=new VideoSrc();
+//        timer=new QTimer();
+//        connect(timer,SIGNAL(timeout()),this,SLOT(work()));
+//        timer->start(10);
+//        connect(p_src,SIGNAL(frame_update(Mat)),&render,SLOT(set_mat(Mat)));
+//    }
+//    ~Camera(){
+//        delete timer;
+//    }
+
+//signals:
+
+//public slots:
+//    void work()
+//    {
+//        tick++;
+//        //    prt(info,"working");
+//        p_src->set(handler);
+//        if(tick==200){
+//            tick=0;
+//            delete p_src;
+//            p_src=new VideoSrc();
+//             connect(p_src,SIGNAL(frame_update(Mat)),&render,SLOT(set_mat(Mat)));
+//        }
+//    //    handler.work();
+//    }
+
+//private:
+//    camera_data_t data;
+//    QTimer *timer;
+
+
+//};
 
 #include"camera.h"
 #include <QGridLayout>
@@ -234,6 +334,15 @@ public:
 //            delete cams[i];
 //        }
     }
+    void save_config(QByteArray rst){
+        cfg->set_ba(rst);
+
+        cfg->save();
+    }
+    QByteArray get_config()
+    {
+        return cfg->get_ba();
+    }
 
     void add_camera(QString ip)
     {
@@ -257,8 +366,8 @@ public:
         int num=cams.size();
         Camera *c=cams[index-1];
         delete c;
-        cams.removeAt(index);
-        cfg->data.camera.removeAt(index);
+        cams.removeAt(index-1);
+        cfg->data.camera.removeAt(index-1);
         cfg->data.camera_amount--;
         cfg->save();
     }
@@ -272,6 +381,7 @@ public:
             delete c;
         }
         int num;
+        cams.clear();
         for(int i=0;i<cfg->data.camera_amount;i++){
              Camera *c=new Camera(cfg->data.camera[i]);
              cams.append(c);

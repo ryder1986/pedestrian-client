@@ -52,18 +52,14 @@ void MainWindow::on_pushButton_connect_server_clicked()
 
 void MainWindow::on_pushButton_get_config_clicked()
 {
+    int request_length=Protocol::encode_configuration_request(buf);
+    QByteArray rst=client->call_server(buf,request_length);
+    rst=rst.remove(0,Protocol::HEAD_LENGTH);//TODO:get the ret value
 
-  //  QByteArray cc("12345");
-//    cc=cc.remove(2,2);
-
-
-
-    int len=Protocol::encode_configuration_request(buf);
-    QByteArray rst=client->call_server(buf,Protocol::HEAD_LENGTH);
-    rst=rst.remove(0,Protocol::HEAD_LENGTH);
-    cam_manager->cfg->set_ba(rst);
+    cam_manager->save_config(rst);
+    // cam_manager->cfg->set_ba(rst);
     cam_manager->reconfig_camera(ui->gridLayout_2);
-    cam_manager->cfg->save();
+  //  cam_manager->cfg->save();
    // YuvRender *r=new YuvRender();
   //  connect(cam_manager->cams,SIGNAL())
 
@@ -78,11 +74,15 @@ void MainWindow::on_pushButton_add_clicked()
 
     QString ip=ui->lineEdit_add->text();
     cam_manager->add_camera(ip);
-    QByteArray setting= cam_manager->cfg->get_ba();
+   // QByteArray setting= cam_manager->cfg->get_ba();
+      QByteArray setting= cam_manager->get_config();
+
+
     int len=Protocol::encode_addcam_request(buf,setting.length());
     memcpy(buf+Protocol::HEAD_LENGTH,setting.data(),setting.length());
 
-    QByteArray rst=client->call_server(buf,Protocol::HEAD_LENGTH+setting.length());
+    QByteArray rst=client->call_server(buf,len);
+    cam_manager->reconfig_camera(ui->gridLayout_2);
 //    rst=rst.remove(0,Protocol::HEAD_LENGTH);
 
    // YuvRender *r=new YuvRender();
@@ -96,6 +96,7 @@ void MainWindow::on_pushButton_add_clicked()
 void MainWindow::on_pushButton_del_clicked()
 {
      QString index=ui->lineEdit_del->text();
+     if(index.toInt()<=cam_manager->cams.size()&&index.toInt()>0)
      cam_manager->del_camera(index.toInt());
      Protocol::encode_delcam_request(buf,index.toInt());
      client->call_server(buf,Protocol::HEAD_LENGTH);
