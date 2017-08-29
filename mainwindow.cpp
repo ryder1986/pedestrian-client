@@ -59,9 +59,9 @@ void MainWindow::on_pushButton_get_config_clicked()
     cam_manager->save_config(rst);
     // cam_manager->cfg->set_ba(rst);
     cam_manager->reconfig_camera(ui->gridLayout_2);
-  //  cam_manager->cfg->save();
-   // YuvRender *r=new YuvRender();
-  //  connect(cam_manager->cams,SIGNAL())
+    //  cam_manager->cfg->save();
+    // YuvRender *r=new YuvRender();
+    //  connect(cam_manager->cams,SIGNAL())
 
     ui->lineEdit_get->setText( cam_manager->cfg->get_ba());
 }
@@ -74,8 +74,8 @@ void MainWindow::on_pushButton_add_clicked()
 
     QString ip=ui->lineEdit_add->text();
     cam_manager->add_camera(ip);
-   // QByteArray setting= cam_manager->cfg->get_ba();
-      QByteArray setting= cam_manager->get_config();
+    // QByteArray setting= cam_manager->cfg->get_ba();
+    QByteArray setting= cam_manager->get_config();
 
 
     int len=Protocol::encode_addcam_request(buf,setting.length());
@@ -83,21 +83,22 @@ void MainWindow::on_pushButton_add_clicked()
 
     QByteArray rst=client->call_server(buf,len);
     cam_manager->reconfig_camera(ui->gridLayout_2);
-//    rst=rst.remove(0,Protocol::HEAD_LENGTH);
+    //    rst=rst.remove(0,Protocol::HEAD_LENGTH);
 
-   // YuvRender *r=new YuvRender();
-  //  connect(cam_manager->cams,SIGNAL())
+    // YuvRender *r=new YuvRender();
+    //  connect(cam_manager->cams,SIGNAL())
 
- ///   cam_manager->add_camera("/root/repo-github/pedestrian/test.264");
+    ///   cam_manager->add_camera("/root/repo-github/pedestrian/test.264");
 }
 
 
 
 void MainWindow::on_pushButton_del_clicked()
 {
-     QString index=ui->lineEdit_del->text();
-     if(index.toInt()<=cam_manager->cams.size()&&index.toInt()>0)
-     cam_manager->del_camera(index.toInt());
-     Protocol::encode_delcam_request(buf,index.toInt());
-     client->call_server(buf,Protocol::HEAD_LENGTH);
+    QString index=ui->lineEdit_del->text();
+    if(index.toInt()<=cam_manager->cams.size()&&index.toInt()>0)
+    {  cam_manager->del_camera(index.toInt());
+        Protocol::encode_delcam_request(buf,index.toInt());
+        client->call_server(buf,Protocol::HEAD_LENGTH);
+    }
 }
